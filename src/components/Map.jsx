@@ -167,7 +167,6 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     if (mapInstance.current) {
       // If a popup is open, we can still update markers but need to be careful
       // about clearing existing markers that might have the popup open
-      const startTime = performance.now();
       
       const currentMarkerKeys = Object.keys(markersRef.current);
       const newServiceKeys = new Set(serviceKeys);
@@ -185,7 +184,6 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
         }
       });
       
-      let renderedCount = 0;
       if (clusterIndexRef.current) {
         // Use mapState if available, otherwise fall back to direct map calls
         let bounds, zoom;
@@ -270,7 +268,6 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             });
           }
           markersRef.current[key] = marker;
-          renderedCount++;
         });
       } else {
         // Fallback to individual markers
@@ -290,16 +287,12 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             });
             marker.on('click', () => onServiceSelect(service));
             markersRef.current[serviceKey] = marker;
-            renderedCount++;
           }
         });
       }
       
-      const endTime = performance.now();
-      const processingTime = endTime - startTime;
-      const finalMarkerCount = Object.keys(markersRef.current).length;
     }
-  }, [services, serviceKeys, keys, defs, onServiceSelect, generatePopupContent, mapState]);
+  }, [services, serviceKeys, keys, defs, generatePopupContent, mapState]);
 
   // Handle selected service from list
   useEffect(() => {

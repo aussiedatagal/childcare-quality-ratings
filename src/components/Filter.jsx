@@ -76,7 +76,8 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
   };
 
   // Memoize filter calculations to avoid expensive operations
-  const applyFilters = useCallback(debounce((filters) => {
+  const applyFilters = useCallback((filters) => {
+    const debouncedFilter = debounce((filterData) => {
     // Pre-calculate values to avoid repeated calculations
     const overallRatingValues = filters.overallRatings.length > 0 
       ? new Set(filters.overallRatings.map(r => r.value))
@@ -174,8 +175,11 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
     });
 
 
-    onFilterChange(filtered);
-  }, 150), [services, onFilterChange]); // Reduced debounce time for better responsiveness
+      onFilterChange(filtered);
+    }, 150);
+    
+    debouncedFilter(filters);
+  }, [services, onFilterChange]); // Reduced debounce time for better responsiveness
 
   useEffect(() => {
     applyFilters({

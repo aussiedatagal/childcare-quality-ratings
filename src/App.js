@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import L from 'leaflet';
 import Header from './components/Header';
 import Map from './components/Map';
 import ServiceList from './components/ServiceList';

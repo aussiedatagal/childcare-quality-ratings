@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import QualityAreaRating from './QualityAreaRating';
-import { getRatingColor, getRatingTextColor, stripNQS } from '../utils/helpers';
+import { getRatingColor, stripNQS } from '../utils/helpers';
 
 const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = false }) => {
   if (!service || !keys || !defs) return null;
@@ -8,7 +7,6 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
   const rating = service.rating || 'N/A';
   const ratingLabel = stripNQS(keys.ratings?.[rating]) || 'Not Available';
   const ratingColor = getRatingColor(rating);
-  const ratingTextColor = getRatingTextColor(rating);
 
   // Generate ACECQA URL from service name
   const generateACECQAUrl = (serviceName) => {
