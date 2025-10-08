@@ -1,0 +1,74 @@
+{
+    "ratings": {
+        "E": {
+            "label": "Excellent",
+            "description": "Awarded by ACECQA to services that demonstrate excellence in practice, community leadership, and commitment to continuous quality improvement, exceeding the National Quality Standard."
+        },
+        "X": {
+            "label": "Exceeding NQS",
+            "description": "The service is exceeding the National Quality Standard in all seven Quality Areas, showing a level of practice above and beyond the requirements."
+        },
+        "M": {
+            "label": "Meeting NQS",
+            "description": "The service meets all seven Quality Areas of the National Quality Standard and the requirements of the National Regulations."
+        },
+        "W": {
+            "label": "Working Towards NQS",
+            "description": "The service is meeting at least four of the seven Quality Areas of the National Quality Standard and is required to take action to address the remaining areas."
+        },
+        "S": {
+            "label": "Significant Improvement Required",
+            "description": "The service has failed to meet the National Quality Standard and is subject to compliance action by the Regulatory Authority."
+        },
+        "N": {
+            "label": "Not Assessed",
+            "description": "The service approval has been granted but the service has not yet been assessed against the National Quality Standard."
+        },
+        "P": {
+            "label": "Provisional",
+            "description": "A temporary rating that may be given if the service has been assessed but the rating outcome is pending or under review."
+        },
+        "R": {
+            "label": "Rating Revoked",
+            "description": "The service's rating has been revoked by the Regulatory Authority, often due to significant regulatory or operational failures."
+        },
+        "U": {
+            "label": "Suspended",
+            "description": "The service's operations or rating process is suspended by the Regulatory Authority."
+        },
+        "A": {
+            "label": "N/A or Missing Data",
+            "description": "No applicable rating exists for this field, or the data was missing/null in the source file."
+        }
+    },
+    "quality_areas": {
+        "qa1": {
+            "label": "Educational Program and Practice",
+            "description": "The educational program supports all children's learning and development, is based on an approved learning framework, and is planned and implemented in ways that ensure children achieve learning outcomes."
+        },
+        "qa2": {
+            "label": "Children's Health and Safety",
+            "description": "Children's health and safety are promoted, and they are protected from illness and hazard."
+        },
+        "qa3": {
+            "label": "Physical Environment",
+            "description": "The physical environment is safe, suitable, and provides a rich and diverse range of experiences that promote children\u2019s learning and development."
+        },
+        "qa4": {
+            "label": "Staffing Arrangements",
+            "description": "Qualified and experienced educators, who develop warm, respectful relationships with children, create predictable environments and encourage children\u2019s active engagement in the learning program."
+        },
+        "qa5": {
+            "label": "Relationships with Children",
+            "description": "Relationships with children are responsive, respectful, and promote children\u2019s sense of belonging."
+        },
+        "qa6": {
+            "label": "Collaborative Partnerships with Families and Communities",
+            "description": "Collaborative partnerships with families and communities are formed to ensure continuity of learning and to support children\u2019s inclusion and participation in the community."
+        },
+        "qa7": {
+            "label": "Governance and Leadership",
+            "description": "Effective leadership and governance of the service contribute to the ongoing improvement of quality outcomes for children."
+        }
+    }
+}

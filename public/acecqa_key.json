@@ -1,0 +1,43 @@
+{
+    "ratings": {
+        "E": "Excellent",
+        "X": "Exceeding NQS",
+        "M": "Meeting NQS",
+        "W": "Working Towards NQS",
+        "S": "Significant Improvement Required",
+        "N": "Not Assessed",
+        "P": "Provisional",
+        "R": "Rating Revoked",
+        "U": "Suspended"
+    },
+    "types": {
+        "LDC": "Long Day Care",
+        "PKS": "Preschool/Kindergarten - Stand alone",
+        "PKP": "Preschool/Kindergarten - Part of a School",
+        "OSHC_A": "Outside School Hours Care - After School",
+        "OSHC_B": "Outside School Hours Care - Before School",
+        "OSHC_V": "Outside School Hours Care - Vacation Care",
+        "FDC": "Family Day Care"
+    },
+    "columns": {
+        "name": "Service Name",
+        "address": "Service Address",
+        "suburb": "Suburb",
+        "state": "State",
+        "postcode": "Postcode",
+        "type": "Service Type (Coded)",
+        "places": "Approved Places",
+        "rating": "Overall Rating (Coded)",
+        "qa1": "Quality Area 1 Rating (Coded)",
+        "qa2": "Quality Area 2 Rating (Coded)",
+        "qa3": "Quality Area 3 Rating (Coded)",
+        "qa4": "Quality Area 4 Rating (Coded)",
+        "qa5": "Quality Area 5 Rating (Coded)",
+        "qa6": "Quality Area 6 Rating (Coded)",
+        "qa7": "Quality Area 7 Rating (Coded)",
+        "start_time": "Earliest Weekday Start Time (Annual)",
+        "end_time": "Latest Weekday End Time (Annual)",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
+    }
+}

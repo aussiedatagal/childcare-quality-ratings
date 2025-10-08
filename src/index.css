@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for a cleaner look */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Custom map marker styles */
+.map-marker-dot {
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+.map-marker-star {
+    font-size: 24px;
+    text-shadow: 0 0 3px #000;
+    line-height: 1;
+}
+
+/* Mobile popup styles */
+.mobile-popup .leaflet-popup-content {
+    margin: 8px 12px;
+    line-height: 1.4;
+}
+
+.mobile-popup .leaflet-popup-content-wrapper {
+    border-radius: 8px;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+    .mobile-popup .leaflet-popup-content {
+        font-size: 12px;
+    }
+    
+    .mobile-popup .leaflet-popup-tip {
+        width: 12px;
+        height: 12px;
+    }
+    
+    /* Reduce map control sizes on mobile */
+    .leaflet-control-zoom a {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 18px;
+    }
+    
+    /* Make location button smaller on mobile */
+    .my-location-button {
+        width: 28px !important;
+        height: 28px !important;
+        line-height: 24px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 480px) {
+    /* Even smaller popups on very small screens */
+    .mobile-popup .leaflet-popup-content {
+        font-size: 11px;
+        margin: 6px 10px;
+    }
+    
+    /* Smaller filter panel on very small screens */
+    .leaflet-control {
+        font-size: 12px;
+    }
+}
