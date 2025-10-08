@@ -22,9 +22,9 @@ export const useData = () => {
     const fetchData = async () => {
       try {
         const [servicesCsvText, keysData, defsData] = await Promise.all([
-          fetch('./acecqa_processed_data.csv').then(res => res.text()),
-          fetch('./acecqa_key.json').then(res => res.json()),
-          fetch('./acecqa_rating_definitions.json').then(res => res.json()),
+          fetch(`${process.env.PUBLIC_URL}/acecqa_processed_data.csv`).then(res => res.text()),
+          fetch(`${process.env.PUBLIC_URL}/acecqa_key.json`).then(res => res.json()),
+          fetch(`${process.env.PUBLIC_URL}/acecqa_rating_definitions.json`).then(res => res.json()),
         ]);
         
         const servicesData = csvParse(servicesCsvText);
@@ -55,8 +55,8 @@ export const useData = () => {
         let spatialIndex = null;
         try {
           const [binRes, metaRes] = await Promise.all([
-            fetch('./services.index.bin'),
-            fetch('./services.index.meta.json')
+            fetch(`${process.env.PUBLIC_URL}/services.index.bin`),
+            fetch(`${process.env.PUBLIC_URL}/services.index.meta.json`)
           ]);
           if (binRes.ok && metaRes.ok) {
             const [binBuf, meta] = [await binRes.arrayBuffer(), await metaRes.json()];

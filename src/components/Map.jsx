@@ -27,9 +27,13 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
   const [mapState, setMapState] = useState({ zoom: 4, bounds: [[-44, 113], [-10, 154]] }); // Default Australia bounds
 
   const onBoundsChangeRef = useRef(onBoundsChange);
+  const onServiceSelectRef = useRef(onServiceSelect);
   useEffect(() => {
     onBoundsChangeRef.current = onBoundsChange;
   }, [onBoundsChange]);
+  useEffect(() => {
+    onServiceSelectRef.current = onServiceSelect;
+  }, [onServiceSelect]);
 
   // Memoize service key generation to avoid recalculation
   const serviceKeys = useMemo(() => {
@@ -118,7 +122,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
         mapInstance.current.on('popupopen', () => { popupOpenRef.current = true; });
         mapInstance.current.on('popupclose', () => {
           popupOpenRef.current = false;
-          try { onServiceSelect && onServiceSelect(null); } catch {}
+          try { onServiceSelectRef.current && onServiceSelectRef.current(null); } catch {}
         });
       handleMapChange();
       };
@@ -263,7 +267,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             });
             marker.on('click', () => {
               ignoreNextMoveRef.current = true; // opening popup will autoPan
-              onServiceSelect(service);
+              onServiceSelectRef.current(service);
               marker.openPopup();
             });
           }
@@ -285,7 +289,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
               maxWidth: window.innerWidth < 640 ? 300 : 400, // Smaller popup on mobile
               className: 'mobile-popup'
             });
-            marker.on('click', () => onServiceSelect(service));
+            marker.on('click', () => onServiceSelectRef.current(service));
             markersRef.current[serviceKey] = marker;
           }
         });
