@@ -5,10 +5,8 @@ import { stripNQS } from '../utils/helpers';
 
 const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
   
-  // Detect if mobile and set initial expanded state
-  const [isExpanded, setIsExpanded] = useState(() => {
-    return window.innerWidth >= 1024; // Start expanded on desktop, collapsed on mobile
-  });
+  // Set initial expanded state - closed by default on all devices
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Hooks are at the top level. Initialize state directly from props, which are now guaranteed to exist.
   const [overallRatings, setOverallRatings] = useState([]);
