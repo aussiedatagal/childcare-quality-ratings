@@ -6,7 +6,7 @@ export const getRatingColor = (rating) => {
         case 'M': // Meeting
             return '#60A5FA'; // Blue-400
         case 'W': // Working Towards
-            return '#FBBF24'; // Amber-400
+            return '#FB923C'; // Orange-400
         case 'S': // Significant Improvement Required
             return '#F87171'; // Red-400
         default:
