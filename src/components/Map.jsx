@@ -161,7 +161,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
         ] },
       }));
 
-    const index = new Supercluster({ radius: 60, maxZoom: 17 });
+    const index = new Supercluster({ radius: 100, maxZoom: 13, minPoints: 30 });
     index.load(points);
     clusterIndexRef.current = index;
   }, [services]);
