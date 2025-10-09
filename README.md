@@ -2,7 +2,7 @@
 
 A data visualization web application that displays Australian childcare service quality ratings on an interactive map. Built with React and Leaflet, this tool helps parents and caregivers find and compare childcare services based on their National Quality Standard (NQS) ratings.
 
-![Childcare Quality Rating Map](screenshot.png)
+![Childcare Quality Rating Map](social-card.png)
 
 ## Features
 
