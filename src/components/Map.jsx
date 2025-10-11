@@ -262,10 +262,13 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             const popupContent = createPopupContent(service);
             marker.bindPopup(popupContent, { 
               autoPan: true, 
-              autoPanPadding: [20, 100], 
-              keepInView: false,
-              maxWidth: window.innerWidth < 640 ? 300 : 400, // Smaller popup on mobile
-              className: 'mobile-popup'
+              autoPanPadding: [20, 20], // Reduced padding for mobile
+              keepInView: true, // Keep popup in view
+              maxWidth: window.innerWidth < 640 ? 280 : 400, // Even smaller on mobile
+              maxHeight: window.innerWidth < 640 ? 400 : 600, // Limit height on mobile
+              className: 'mobile-popup',
+              closeOnClick: false, // Prevent accidental closing
+              autoClose: false // Don't auto-close when opening another popup
             });
             marker.on('click', () => {
               ignoreNextMoveRef.current = true; // opening popup will autoPan
@@ -286,10 +289,13 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             const popupContent = createPopupContent(service);
             marker.bindPopup(popupContent, { 
               autoPan: true, 
-              autoPanPadding: [20, 100], 
-              keepInView: false,
-              maxWidth: window.innerWidth < 640 ? 300 : 400, // Smaller popup on mobile
-              className: 'mobile-popup'
+              autoPanPadding: [20, 20], // Reduced padding for mobile
+              keepInView: true, // Keep popup in view
+              maxWidth: window.innerWidth < 640 ? 280 : 400, // Even smaller on mobile
+              maxHeight: window.innerWidth < 640 ? 400 : 600, // Limit height on mobile
+              className: 'mobile-popup',
+              closeOnClick: false, // Prevent accidental closing
+              autoClose: false // Don't auto-close when opening another popup
             });
             marker.on('click', () => onServiceSelectRef.current(service));
             markersRef.current[serviceKey] = marker;
