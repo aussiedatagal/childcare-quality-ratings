@@ -1,9 +1,11 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { getRatingColor, stripNQS } from '../utils/helpers';
 
 const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = false }) => {
+  const [showConditions, setShowConditions] = useState(false);
+  
   if (!service || !keys || !defs) return null;
-
+  
   const rating = service.rating || 'N/A';
   const ratingLabel = stripNQS(keys.ratings?.[rating]) || 'Not Available';
   const ratingColor = getRatingColor(rating);
@@ -34,7 +36,7 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
   };
 
   const cardClasses = isPopup
-    ? 'w-72 sm:w-80 bg-white p-3 sm:p-4 rounded-lg shadow-sm max-h-96 sm:max-h-none overflow-y-auto sm:overflow-visible' // Only scroll on mobile
+    ? 'w-72 sm:w-80 bg-white p-3 sm:p-4 rounded-lg shadow-sm max-h-[80vh] overflow-y-auto' // Use viewport height for better responsiveness
     : 'bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow';
 
   const titleClasses = isPopup
@@ -127,6 +129,30 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
           })}
         </div>
       </div>
+      
+      {/* Conditions Section */}
+      {service.conditions && service.conditions.trim() !== '' && (
+        <div className="mt-2 border-t pt-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowConditions(!showConditions);
+            }}
+            className="flex items-center justify-between w-full text-left"
+          >
+            <h4 className="text-xs font-semibold text-gray-700">Regulatory Conditions</h4>
+            <span className={`transform transition-transform text-xs ${showConditions ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          </button>
+          {showConditions && (
+            <div className={`mt-1 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-gray-700 ${isPopup ? '' : 'max-h-32 overflow-y-auto'}`}>
+              <p className="whitespace-pre-wrap">{service.conditions}</p>
+            </div>
+          )}
+        </div>
+      )}
+      
       {/* FIX: Removed redundant button from popup view */}
     </div>
   );
