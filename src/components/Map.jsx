@@ -3,6 +3,7 @@ import L from 'leaflet';
 import Supercluster from 'supercluster';
 import 'leaflet/dist/leaflet.css';
 import ReactDOMServer from 'react-dom/server';
+import ReactDOM from 'react-dom/client';
 import ServiceCard from './ServiceCard';
 import Legend from './Legend';
 import { getRatingIcon } from '../utils/helpers';
@@ -40,15 +41,16 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     return services.map(service => service.name + service.address);
   }, [services]);
 
-  // Memoize popup content generation
-  const generatePopupContent = useCallback((service) => {
-    const cacheKey = service.name + service.address;
-    if (!popupCacheRef.current[cacheKey]) {
-      popupCacheRef.current[cacheKey] = ReactDOMServer.renderToString(
-        <ServiceCard service={service} keys={keys} defs={defs} isPopup={true} />
-      );
-    }
-    return popupCacheRef.current[cacheKey];
+  // Create popup content using React portal
+  const createPopupContent = useCallback((service) => {
+    const popupDiv = document.createElement('div');
+    popupDiv.className = 'popup-container';
+    
+    // Render the ServiceCard component into the popup div
+    const root = ReactDOM.createRoot(popupDiv);
+    root.render(<ServiceCard service={service} keys={keys} defs={defs} isPopup={true} />);
+    
+    return popupDiv;
   }, [keys, defs]);
 
   // Initialize map - runs ONLY ONCE
@@ -257,7 +259,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
             if (!service) return;
             const icon = getRatingIcon(service.rating, keys, L);
             marker = L.marker([lat, lng], { icon }).addTo(mapInstance.current);
-            const popupContent = generatePopupContent(service);
+            const popupContent = createPopupContent(service);
             marker.bindPopup(popupContent, { 
               autoPan: true, 
               autoPanPadding: [20, 100], 
@@ -281,7 +283,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
           if (lat && lng && !markersRef.current[serviceKey]) {
             const icon = getRatingIcon(service.rating, keys, L);
             const marker = L.marker([lat, lng], { icon }).addTo(mapInstance.current);
-            const popupContent = generatePopupContent(service);
+            const popupContent = createPopupContent(service);
             marker.bindPopup(popupContent, { 
               autoPan: true, 
               autoPanPadding: [20, 100], 
@@ -296,7 +298,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
       }
       
     }
-  }, [services, serviceKeys, keys, defs, generatePopupContent, mapState]);
+  }, [services, serviceKeys, keys, defs, createPopupContent, mapState]);
 
   // Handle selected service from list
   useEffect(() => {

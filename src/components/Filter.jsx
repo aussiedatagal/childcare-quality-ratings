@@ -18,6 +18,7 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
   const [includeUnknownHours, setIncludeUnknownHours] = useState(true); // Include services with unknown/empty opening hours
   const [includeUnknownRatings, setIncludeUnknownRatings] = useState(true); // Include services with unknown/empty overall ratings
   const [filterByTime, setFilterByTime] = useState(false); // Default to "Any time" (no time filtering)
+  const [conditionsFilter, setConditionsFilter] = useState('all'); // 'all', 'with', 'without'
   const [initialized, setInitialized] = useState(false);
 
   // Initialize default selections
@@ -53,6 +54,9 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
         ];
       });
       setQualityAreaRatings(defaultQARatings);
+
+      // Set default conditions filter to 'all'
+      setConditionsFilter('all');
 
       setInitialized(true);
     }
@@ -91,6 +95,8 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
         qa,
         values: new Set(ratings.map(r => r.value))
       }));
+
+    const conditionsFilter = filters.conditionsFilter;
 
     // Use more efficient filtering with early returns
     const filtered = services.filter(service => {
@@ -169,6 +175,17 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
         }
       }
 
+      // Conditions filter
+      if (conditionsFilter !== 'all') {
+        const hasConditions = service.conditions && service.conditions.trim() !== '' && service.conditions.trim().length > 0;
+        if (conditionsFilter === 'with' && !hasConditions) {
+          return false;
+        }
+        if (conditionsFilter === 'without' && hasConditions) {
+          return false;
+        }
+      }
+
       return true;
     });
 
@@ -189,9 +206,10 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
       includeUnknownPlaces,
       includeUnknownHours,
       includeUnknownRatings,
-      filterByTime
+      filterByTime,
+      conditionsFilter
     });
-  }, [overallRatings, serviceTypes, qualityAreaRatings, approvedPlaces, openHours, includeUnknownPlaces, includeUnknownHours, includeUnknownRatings, filterByTime, applyFilters]);
+  }, [overallRatings, serviceTypes, qualityAreaRatings, approvedPlaces, openHours, includeUnknownPlaces, includeUnknownHours, includeUnknownRatings, filterByTime, conditionsFilter, applyFilters]);
 
   const handleQARatingChange = (qa, selectedOptions) => {
     setQualityAreaRatings(prev => ({ ...prev, [qa]: selectedOptions }));
@@ -346,6 +364,33 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
                       }
                     }}
                     className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700">{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Conditions Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Regulatory Conditions</label>
+            <p className="text-xs text-gray-500 mb-2">
+              Filter by whether services have regulatory conditions imposed
+            </p>
+            <div className="space-y-1">
+              {[
+                { value: 'all', label: 'All Services' },
+                { value: 'with', label: 'With Conditions' },
+                { value: 'without', label: 'Without Conditions' }
+              ].map(option => (
+                <label key={option.value} className="flex items-center text-sm">
+                  <input
+                    type="radio"
+                    name="conditionsFilter"
+                    value={option.value}
+                    checked={conditionsFilter === option.value}
+                    onChange={(e) => setConditionsFilter(e.target.value)}
+                    className="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-gray-700">{option.label}</span>
                 </label>
