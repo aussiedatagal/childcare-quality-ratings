@@ -103,7 +103,9 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
 
       mapInstance.current.on('moveend', handleMapChange);
       mapInstance.current.on('zoomend', handleMapChange);
-        mapInstance.current.on('popupopen', () => { popupOpenRef.current = true; });
+        mapInstance.current.on('popupopen', () => { 
+          popupOpenRef.current = true; 
+        });
         mapInstance.current.on('popupclose', () => {
           popupOpenRef.current = false;
           try { onServiceSelectRef.current && onServiceSelectRef.current(null); } catch {}
@@ -243,10 +245,13 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
               maxHeight: window.innerWidth < 640 ? 400 : 600, // Limit height on mobile
               className: 'mobile-popup',
               closeOnClick: false, // Prevent accidental closing
-              autoClose: false // Don't auto-close when opening another popup
+              autoClose: true // Allow auto-close to ensure only one popup is open
             });
               marker.on('click', () => {
                 ignoreNextMoveRef.current = true;
+                if (mapInstance.current && mapInstance.current.closePopup) {
+                  mapInstance.current.closePopup();
+                }
                 onServiceSelectRef.current(service);
                 marker.openPopup();
               });
@@ -269,9 +274,14 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
               maxHeight: window.innerWidth < 640 ? 400 : 600, // Limit height on mobile
               className: 'mobile-popup',
               closeOnClick: false, // Prevent accidental closing
-              autoClose: false // Don't auto-close when opening another popup
+              autoClose: true // Allow auto-close to ensure only one popup is open
             });
-            marker.on('click', () => onServiceSelectRef.current(service));
+            marker.on('click', () => {
+              if (mapInstance.current && mapInstance.current.closePopup) {
+                mapInstance.current.closePopup();
+              }
+              onServiceSelectRef.current(service);
+            });
             markersRef.current[serviceKey] = marker;
           }
         });
@@ -291,6 +301,9 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
       const marker = markersRef.current[key];
       if (marker && typeof marker.openPopup === 'function') {
         ignoreNextMoveRef.current = true;
+        if (mapInstance.current && mapInstance.current.closePopup) {
+          mapInstance.current.closePopup();
+        }
         marker.openPopup();
         return;
       }
