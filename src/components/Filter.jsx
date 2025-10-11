@@ -5,26 +5,21 @@ import { stripNQS } from '../utils/helpers';
 
 const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
   
-  // Set initial expanded state - closed by default on all devices
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Hooks are at the top level. Initialize state directly from props, which are now guaranteed to exist.
   const [overallRatings, setOverallRatings] = useState([]);
   const [serviceTypes, setServiceTypes] = useState([]);
   const [qualityAreaRatings, setQualityAreaRatings] = useState({});
   const [approvedPlaces, setApprovedPlaces] = useState(dataRanges.places);
-  const [openHours, setOpenHours] = useState({ min: 900, max: 1500 }); // Default to 9am-3pm
-  const [includeUnknownPlaces, setIncludeUnknownPlaces] = useState(true); // Include services with unknown/empty approved places
-  const [includeUnknownHours, setIncludeUnknownHours] = useState(true); // Include services with unknown/empty opening hours
-  const [includeUnknownRatings, setIncludeUnknownRatings] = useState(true); // Include services with unknown/empty overall ratings
-  const [filterByTime, setFilterByTime] = useState(false); // Default to "Any time" (no time filtering)
-  const [conditionsFilter, setConditionsFilter] = useState('all'); // 'all', 'with', 'without'
+  const [openHours, setOpenHours] = useState({ min: 900, max: 1500 });
+  const [includeUnknownPlaces, setIncludeUnknownPlaces] = useState(true);
+  const [includeUnknownHours, setIncludeUnknownHours] = useState(true);
+  const [includeUnknownRatings, setIncludeUnknownRatings] = useState(true);
+  const [filterByTime, setFilterByTime] = useState(false);
+  const [conditionsFilter, setConditionsFilter] = useState('all');
   const [initialized, setInitialized] = useState(false);
 
-  // Initialize default selections
   useEffect(() => {
     if (keys && defs && !initialized) {
-      // Set default overall ratings (all available options)
       const defaultOverallRatings = [
         { value: 'E', label: 'Excellent' },
         { value: 'X', label: 'Exceeding' },
@@ -35,14 +30,12 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
       ];
       setOverallRatings(defaultOverallRatings);
 
-      // Set default service types (all)
       const defaultServiceTypes = [
         ...Object.entries(keys.types).map(([value, label]) => ({ value, label })),
         { value: '', label: 'Unknown' }
       ];
       setServiceTypes(defaultServiceTypes);
 
-      // Set default quality area ratings (all available options)
       const defaultQARatings = {};
       Object.keys(defs.quality_areas).forEach(qaKey => {
         defaultQARatings[qaKey] = [
@@ -55,20 +48,18 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
       });
       setQualityAreaRatings(defaultQARatings);
 
-      // Set default conditions filter to 'all'
       setConditionsFilter('all');
 
       setInitialized(true);
     }
   }, [keys, defs, initialized]);
 
-  // Sync slider state if dataRanges prop ever changes.
   useEffect(() => {
       setApprovedPlaces(dataRanges.places);
-      // Keep default open hours (9am-3pm) instead of using dataRanges.hours
   }, [dataRanges]);
 
 
+  // Debounce filter updates to avoid excessive re-renders during rapid changes
   const debounce = (func, delay) => {
     let timeout;
     return (...args) => {
@@ -77,10 +68,8 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
     };
   };
 
-  // Memoize filter calculations to avoid expensive operations
   const applyFilters = useCallback((filters) => {
     const debouncedFilter = debounce((filterData) => {
-    // Pre-calculate values to avoid repeated calculations
     const overallRatingValues = filters.overallRatings.length > 0 
       ? new Set(filters.overallRatings.map(r => r.value))
       : null;
@@ -98,9 +87,8 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
 
     const conditionsFilter = filters.conditionsFilter;
 
-    // Use more efficient filtering with early returns
     const filtered = services.filter(service => {
-      // Overall Rating filter - handle unknown ratings as catch-all for any value not in known list
+      // Handle overall rating filtering with support for unknown ratings
       const knownRatingValues = new Set(['E', 'X', 'M', 'W', 'S']);
       const hasValidRating = service.rating && service.rating.trim() !== '';
       const isKnownRating = hasValidRating && knownRatingValues.has(service.rating);
@@ -109,29 +97,22 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
         return false;
       }
       
-      // If rating is unknown (empty/null or not in known list), check if we should include it
       if (!isKnownRating && !filters.includeUnknownRatings) {
         return false;
       }
-
-      // Service Type filter - intersection logic (service must have at least one selected type)
+      // Service type filtering: include if service has at least one selected type
       if (serviceTypeValues && serviceTypeValues.size > 0) {
-        // Check if service has at least one matching type
         const hasMatchingType = service.types && service.types.some(type => serviceTypeValues.has(type));
         const hasUnknownSelected = serviceTypeValues.has('');
         const hasNoTypes = !service.types || service.types.length === 0;
         
-        
-        // Include if: (has matching type) OR (unknown selected AND no types)
         if (!hasMatchingType && !(hasUnknownSelected && hasNoTypes)) {
           return false;
         }
       } else if (serviceTypeValues && serviceTypeValues.size === 0) {
-        // If service type filter is empty (nothing selected), return no results
         return false;
       }
 
-      // Approved Places filter - handle empty/null places based on checkbox
       const places = parseInt(service.places, 10);
       const hasValidPlaces = !isNaN(places) && service.places && service.places.toString().trim() !== '';
       
@@ -139,12 +120,10 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
         return false;
       }
       
-      // If places is empty/null/NaN, check if we should include it
       if (!hasValidPlaces && !filters.includeUnknownPlaces) {
         return false;
       }
-      
-      // Open Hours filter - only apply if time filtering is enabled
+      // Time filtering: check if service hours overlap with selected time range
       if (filters.filterByTime) {
         const serviceStart = service.start_time ? parseInt(service.start_time.replace(':', ''), 10) : 0;
         const serviceEnd = service.end_time ? parseInt(service.end_time.replace(':', ''), 10) : 2400;
@@ -154,13 +133,11 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
           return false;
         }
         
-        // If hours are empty/null, check if we should include it
         if (!hasValidHours && !filters.includeUnknownHours) {
           return false;
         }
       }
-
-      // Quality Areas filter
+      // Quality area filtering: check each selected quality area
       for (const { qa, values } of qualityAreaFilters) {
         const qaRating = service[qa];
         const hasValidQARating = qaRating && qaRating.trim() !== '';
@@ -169,13 +146,11 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
           return false;
         }
         
-        // If rating is empty/null, check if "Unknown" is selected
         if (!hasValidQARating && !values.has('')) {
           return false;
         }
       }
-
-      // Conditions filter
+      // Conditions filtering: check if service has regulatory conditions
       if (conditionsFilter !== 'all') {
         const hasConditions = service.conditions && service.conditions.trim() !== '' && service.conditions.trim().length > 0;
         if (conditionsFilter === 'with' && !hasConditions) {
@@ -194,7 +169,7 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
     }, 150);
     
     debouncedFilter(filters);
-  }, [services, onFilterChange]); // Reduced debounce time for better responsiveness
+  }, [services, onFilterChange]);
 
   useEffect(() => {
     applyFilters({
@@ -215,7 +190,6 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
     setQualityAreaRatings(prev => ({ ...prev, [qa]: selectedOptions }));
   };
   
-  // Options for multi-select dropdowns. These are now safe to define.
   const ratingOptions = [
     { value: 'E', label: 'Excellent' },
     { value: 'X', label: 'Exceeding' },
@@ -235,7 +209,6 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
     { value: '', label: 'Unknown' }
   ];
 
-  // Don't render until initialized to prevent flash
   if (!initialized || !keys || !defs) {
     return (
       <div className="p-4">
@@ -257,7 +230,6 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
       </div>
       {isExpanded && (
         <div className="px-3 sm:px-4 pb-4 space-y-4 sm:space-y-6">
-          {/* Overall Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>
             <div className="space-y-1">
@@ -292,11 +264,9 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
             </div>
           </div>
 
-          {/* Quality Areas */}
           <div className="space-y-4">
             <h3 className="text-md font-semibold text-gray-700">Quality Area Ratings</h3>
             {Object.entries(defs.quality_areas).map(([qaKey, qaDef]) => {
-              // Map quality area keys to exact ACECQA URLs
               const qaUrls = {
                 'qa1': 'https://www.acecqa.gov.au/national-quality-framework/guide-nqf/section-3-national-quality-standard-and-assessment-and-rating/quality-area-1-educational-program-and-practice',
                 'qa2': 'https://www.acecqa.gov.au/national-quality-framework/guide-nqf/section-3-national-quality-standard-and-assessment-and-rating/quality-area-2-childrens-health-and-safety',
@@ -371,7 +341,6 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
             </div>
           </div>
 
-          {/* Conditions Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Regulatory Conditions</label>
             <p className="text-xs text-gray-500 mb-2">
@@ -398,7 +367,6 @@ const Filter = memo(({ services, keys, defs, dataRanges, onFilterChange }) => {
             </div>
           </div>
 
-          {/* Approved Places */}
           <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                   Approved Places: {approvedPlaces.min} - {approvedPlaces.max}

@@ -2,13 +2,11 @@ import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import L from 'leaflet';
 import Supercluster from 'supercluster';
 import 'leaflet/dist/leaflet.css';
-import ReactDOMServer from 'react-dom/server';
 import ReactDOM from 'react-dom/client';
 import ServiceCard from './ServiceCard';
 import Legend from './Legend';
 import { getRatingIcon } from '../utils/helpers';
 
-// Fix for default icon issue with webpack
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -36,37 +34,29 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     onServiceSelectRef.current = onServiceSelect;
   }, [onServiceSelect]);
 
-  // Memoize service key generation to avoid recalculation
   const serviceKeys = useMemo(() => {
     return services.map(service => service.name + service.address);
   }, [services]);
-
-  // Create popup content using React portal
+  // Create popup content as live React component (not static HTML)
   const createPopupContent = useCallback((service) => {
     const popupDiv = document.createElement('div');
     popupDiv.className = 'popup-container';
     
-    // Render the ServiceCard component into the popup div
     const root = ReactDOM.createRoot(popupDiv);
     root.render(<ServiceCard service={service} keys={keys} defs={defs} isPopup={true} />);
     
     return popupDiv;
   }, [keys, defs]);
 
-  // Initialize map - runs ONLY ONCE
   useEffect(() => {
     if (!mapInstance.current && mapRef.current) {
       
-      let mapInitialized = false; // Flag to prevent multiple initializations
-      
-      // Try to get user's location, fallback to Australia center
+      let mapInitialized = false;
       const initializeMap = (lat = -25.2744, lng = 133.7751, zoom = 4) => {
-        // Prevent multiple initializations
         if (mapInitialized || mapInstance.current) {
           return;
         }
         
-        // Double-check that the ref is still available
         if (!mapRef.current) {
           console.error("Map.jsx: Map container not found during initialization");
           return;
@@ -75,25 +65,19 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
         mapInitialized = true;
         mapInstance.current = L.map(mapRef.current).setView([lat, lng], zoom);
         
-        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mapInstance.current);
-
-
-        // Set up event listeners after map is created
       const handleMapChange = () => {
         if (mapInstance.current && !ignoreNextMoveRef.current) {
           const bounds = mapInstance.current.getBounds();
           const zoom = mapInstance.current.getZoom();
           
-          // FIX: Pass a simple, serializable array instead of the complex Leaflet object
           const boundsArray = [
             [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
             [bounds.getNorthEast().lat, bounds.getNorthEast().lng]
           ];
-          
-          // Check if bounds or zoom have changed significantly
+          // Only update if bounds or zoom changed significantly (avoid excessive updates)
           const lastBounds = lastBoundsRef.current;
           const lastZoom = lastZoomRef.current;
           const boundsChanged = !lastBounds || 
@@ -111,7 +95,6 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
               onBoundsChangeRef.current(boundsArray);
             }
             
-            // Update map state to trigger marker updates
             setMapState({ zoom, bounds: boundsArray });
           }
         }
@@ -120,7 +103,6 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
 
       mapInstance.current.on('moveend', handleMapChange);
       mapInstance.current.on('zoomend', handleMapChange);
-        // Track popup lifecycle and clear selection on close
         mapInstance.current.on('popupopen', () => { popupOpenRef.current = true; });
         mapInstance.current.on('popupclose', () => {
           popupOpenRef.current = false;
@@ -129,13 +111,11 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
       handleMapChange();
       };
 
-      // Initialize map with default location (no automatic geolocation to avoid browser violations)
-      initializeMap(); // Use default Australia location
+      initializeMap();
     }
 
     return () => {
       if (mapInstance.current) {
-        // Clean up event listeners
         if (mapInstance.current._cleanup) {
           mapInstance.current._cleanup();
         }
@@ -145,7 +125,7 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     };
   }, []);
 
-  // Build supercluster index whenever services change (points only)
+  // Build clustering index for performance with large datasets
   const clusterIndexRef = useRef(null);
   useEffect(() => {
     if (!services || services.length === 0) {
@@ -168,17 +148,12 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     clusterIndexRef.current = index;
   }, [services]);
 
-  // Update markers when services change - optimized to only update what's necessary
+  // Update markers when services change - only update what's necessary
   useEffect(() => {
     if (mapInstance.current) {
-      // If a popup is open, we can still update markers but need to be careful
-      // about clearing existing markers that might have the popup open
-      
       const currentMarkerKeys = Object.keys(markersRef.current);
       const newServiceKeys = new Set(serviceKeys);
-      
-      
-      // Remove markers that are no longer needed (defensive checks)
+      // Remove markers that are no longer needed
       currentMarkerKeys.forEach(key => {
         if (!newServiceKeys.has(key)) {
           const marker = markersRef.current[key];
@@ -270,16 +245,15 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
               closeOnClick: false, // Prevent accidental closing
               autoClose: false // Don't auto-close when opening another popup
             });
-            marker.on('click', () => {
-              ignoreNextMoveRef.current = true; // opening popup will autoPan
-              onServiceSelectRef.current(service);
-              marker.openPopup();
-            });
+              marker.on('click', () => {
+                ignoreNextMoveRef.current = true;
+                onServiceSelectRef.current(service);
+                marker.openPopup();
+              });
           }
           markersRef.current[key] = marker;
         });
       } else {
-        // Fallback to individual markers
         services.forEach(service => {
           const { latitude: lat, longitude: lng } = service;
           const serviceKey = service.name + service.address;
@@ -306,21 +280,21 @@ const Map = ({ services, keys, defs, onBoundsChange, selectedService, onServiceS
     }
   }, [services, serviceKeys, keys, defs, createPopupContent, mapState]);
 
-  // Handle selected service from list
+  // Handle popup opening when service is selected from list
   useEffect(() => {
     if (!selectedService || !mapInstance.current) return;
 
     let attempts = 0;
-    const maxAttempts = 10; // ~1s with 100ms cadence
+    const maxAttempts = 10;
     const tryOpen = () => {
       const key = selectedService.name + selectedService.address;
       const marker = markersRef.current[key];
       if (marker && typeof marker.openPopup === 'function') {
-        // Set flag to ignore the next move event that might be triggered by popup opening
         ignoreNextMoveRef.current = true;
         marker.openPopup();
-        return; // success
+        return;
       }
+      // Retry if marker not ready yet (async marker creation)
       if (++attempts < maxAttempts) {
         setTimeout(tryOpen, 100);
       }

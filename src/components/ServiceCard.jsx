@@ -10,37 +10,33 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
   const ratingLabel = stripNQS(keys.ratings?.[rating]) || 'Not Available';
   const ratingColor = getRatingColor(rating);
 
-  // Generate ACECQA URL from service name
+  // Generate ACECQA URL from service name (convert to URL-friendly format)
   const generateACECQAUrl = (serviceName) => {
     if (!serviceName) return '#';
     
-    // Strip punctuation but preserve hyphens, then replace spaces with hyphens
     const urlSlug = serviceName
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove punctuation except hyphens, keep letters, numbers, spaces, and hyphens
-      .replace(/\s+/g, '-'); // Replace spaces with hyphens
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
     
     return `https://www.acecqa.gov.au/resources/national-registers/services/${urlSlug}`;
   };
 
-  // Convert text to title case
   const toTitleCase = (text) => {
     if (!text) return '';
     return text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
   };
-
-  // Format address with suburb
   const formatAddress = (address, suburb) => {
     const titleCaseSuburb = toTitleCase(suburb);
     return suburb ? `${address}, ${titleCaseSuburb}` : address;
   };
 
   const cardClasses = isPopup
-    ? 'w-64 sm:w-80 bg-white p-2 sm:p-4 rounded-lg shadow-sm max-h-[60vh] sm:max-h-[80vh] overflow-y-auto' // More compact on mobile
+    ? 'w-64 sm:w-80 bg-white p-2 sm:p-4 rounded-lg shadow-sm max-h-[60vh] sm:max-h-[80vh] overflow-y-auto'
     : 'bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow';
 
   const titleClasses = isPopup
-    ? 'text-sm sm:text-lg font-bold text-blue-800' // Responsive title sizing
+    ? 'text-sm sm:text-lg font-bold text-blue-800'
     : 'text-sm sm:text-lg font-bold text-blue-800';
 
   return (
@@ -54,7 +50,7 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-800 hover:text-blue-600 hover:underline"
-          onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+          onClick={(e) => e.stopPropagation()}
         >
           {service.name}
         </a>
@@ -130,7 +126,7 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
         </div>
       </div>
       
-      {/* Conditions Section */}
+      {/* Expandable conditions section - only show if conditions exist */}
       {service.conditions && service.conditions.trim() !== '' && (
         <div className="mt-2 border-t pt-2">
           <button
@@ -153,7 +149,6 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
         </div>
       )}
       
-      {/* FIX: Removed redundant button from popup view */}
     </div>
   );
 });
