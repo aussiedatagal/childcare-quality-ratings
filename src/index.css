@@ -24,6 +24,19 @@ body {
   max-height: 80vh;
   overflow-y: auto;
 }
+
+/* Mobile popup styling */
+.mobile-popup {
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 640px) {
+  .mobile-popup {
+    max-height: 60vh !important;
+    max-width: 280px !important;
+  }
+}
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 4px;

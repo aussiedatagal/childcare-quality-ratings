@@ -36,7 +36,7 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
   };
 
   const cardClasses = isPopup
-    ? 'w-72 sm:w-80 bg-white p-3 sm:p-4 rounded-lg shadow-sm max-h-[80vh] overflow-y-auto' // Use viewport height for better responsiveness
+    ? 'w-64 sm:w-80 bg-white p-2 sm:p-4 rounded-lg shadow-sm max-h-[60vh] sm:max-h-[80vh] overflow-y-auto' // More compact on mobile
     : 'bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow';
 
   const titleClasses = isPopup
@@ -146,7 +146,7 @@ const ServiceCard = memo(({ service, keys, defs, onServiceSelect, isPopup = fals
             </span>
           </button>
           {showConditions && (
-            <div className={`mt-1 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-gray-700 ${isPopup ? '' : 'max-h-32 overflow-y-auto'}`}>
+            <div className={`mt-1 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-gray-700 ${isPopup ? 'max-h-32 overflow-y-auto' : 'max-h-32 overflow-y-auto'}`}>
               <p className="whitespace-pre-wrap">{service.conditions}</p>
             </div>
           )}
