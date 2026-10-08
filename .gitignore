@@ -22,3 +22,6 @@ yarn-debug.log*
 yarn-error.log*
 
 data_processing/*
+
+# research behind the page stays local
+research/
